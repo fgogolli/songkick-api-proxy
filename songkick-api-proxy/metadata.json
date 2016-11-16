@@ -1,0 +1,17 @@
+{
+  "name": "fgogolli-songkick-api-proxy",
+  "version": "1.0.0",
+  "author": "fgogolli",
+  "summary": "Puppet module to setup a Songkick API caching proxy based on nginx",
+  "license": "Apache 2.0",
+  "source": "https://github.com/fgogolli/songkick-api-proxy",
+  "project_page": "https://github.com/fgogolli/songkick-api-proxy",
+  "issues_url": "https://github.com/fgogolli/songkick-api-proxy/issues",
+  "dependencies": [
+    {
+      "name":"puppetlabs-stdlib",
+      "version_requirement":">= 1.0.0"
+    }
+  ]
+}
+
