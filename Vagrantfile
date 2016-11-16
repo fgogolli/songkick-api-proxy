@@ -30,9 +30,13 @@ Vagrant.configure("2") do |config|
     config.vm.box = "debian/jessie64"
     config.vm.hostname = "songkick-api-proxy"
     config.vm.network "private_network", ip: "192.168.1.5"
+
+    # The rsync of the vagrant directory is disabled to prevent possible issues on Windows hosts.
     config.vm.synced_folder '.', '/vagrant', disabled: true
 
+    # Therefore, a file provisioner is used to deploy the module inside the Vagrant machine.
     config.vm.provision "copy-module", type: "file", source: "songkick_api_proxy", destination: "/tmp/"
+
     config.vm.provision "deploy-proxy", type: "shell", inline: $provision
 
   end

@@ -127,7 +127,7 @@ class songkick_api_proxy (
     'proxy_ignore_headers' => $proxy_ignore_headers,
   }
 
-  class { '::nginx':
+  class { 'nginx':
     proxy_cache_path      => $proxy_cache_path,
     proxy_cache_keys_zone => "${proxy_cache_key}:${proxy_cache_size}",
     proxy_cache_levels    => $proxy_cache_levels,
