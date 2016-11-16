@@ -1,4 +1,4 @@
-# === Class: songkick-api-proxy
+# === Class: songkick_api_proxy
 #
 # This module deploys an nginx server as a reverse proxy with caching
 # for the Songkick API.
@@ -51,10 +51,12 @@
 #   The proxy HTTP request methods to cache. Default: 'GET;'
 #
 # [*proxy_add_header*]
-#   The HTTP cache header to be returned to clients. Default: 'X-Proxy-Cache $upstream_cache_status;'
+#   The HTTP cache header to be returned to clients. Default: 
+#   'X-Proxy-Cache $upstream_cache_status;'
 #
 # [*proxy_ignore_headers*]
-#   The HTTP headers to be ignored by proxy. Default: 'X-Accel-Expires Expires Cache-Control Set-Cookie;'
+#   The HTTP headers to be ignored by proxy. Default: 
+#   'X-Accel-Expires Expires Cache-Control Set-Cookie;'
 #
 # [*allow_ranges*]
 #   The IP ranges that should be allowed to access the proxy. Default: 
@@ -71,12 +73,11 @@
 #    'Host api.songkick.com',
 #    'X-Real-IP $remote_addr',
 #    'X-Forwarded-For $proxy_add_x_forwarded_for',
-#    'Proxy ""',
 #  ],
 #
 # === Examples
 #
-#  class { 'songkick-api-proxy': }
+#  class { 'songkick_api_proxy': }
 #
 # === Authors
 #
@@ -86,7 +87,7 @@
 #
 # Copyright 2016 Flamur Gogolli
 #
-class songkick-api-proxy (
+class songkick_api_proxy (
   $api_upstream          = 'api.songkick.com',
   $api_upstream_port     = '80',
   $api_vhost             = 'songkick-api-proxy',
@@ -104,7 +105,7 @@ class songkick-api-proxy (
   $proxy_cache_methods   = 'GET;',
   $proxy_add_header      = 'X-Proxy-Cache $upstream_cache_status;',
   $proxy_ignore_headers  = 'X-Accel-Expires Expires Cache-Control Set-Cookie;',
-  $allow_ranges          = [ 
+  $allow_ranges          = [
     '127.0.0.1/8',
     '192.168.1.0/29',
   ],
@@ -112,62 +113,60 @@ class songkick-api-proxy (
     'Host api.songkick.com',
     'X-Real-IP $remote_addr',
     'X-Forwarded-For $proxy_add_x_forwarded_for',
-    'Proxy ""',
   ],
 ){
 
   $allow_cfg = {
-    'allow'      => $allow_ranges,
-    'deny'       => 'all'
+    'allow' => $allow_ranges,
+    'deny'  => 'all'
   }
 
   $proxy_cfg = {
-    'proxy_cache_methods'   => $proxy_cache_methods,
-    'add_header'            => $proxy_add_header,
-    'proxy_ignore_headers'  => $proxy_ignore_headers,
+    'proxy_cache_methods'  => $proxy_cache_methods,
+    'add_header'           => $proxy_add_header,
+    'proxy_ignore_headers' => $proxy_ignore_headers,
   }
 
-  class { 'nginx':
-    proxy_cache_path       =>  $proxy_cache_path,
-    proxy_use_temp_path    =>  $proxy_use_temp_path,
-    proxy_cache_keys_zone  =>  "${proxy_cache_key}:${proxy_cache_size}",
-    proxy_cache_levels     =>  $proxy_cache_levels,
-    proxy_set_header       =>  $proxy_set_header,
+  class { '::nginx':
+    proxy_cache_path      => $proxy_cache_path,
+    proxy_cache_keys_zone => "${proxy_cache_key}:${proxy_cache_size}",
+    proxy_cache_levels    => $proxy_cache_levels,
+    proxy_set_header      => $proxy_set_header,
   }
 
   nginx::resource::upstream { $upstream_proxy:
     members => [
-      "$api_upstream:$api_upstream_port",
+      "${api_upstream}:${api_upstream_port}",
     ],
   }
 
   nginx::resource::vhost { $api_vhost:
-    listen_port        => $api_vhost_port,
-    proxy              => "${upstream_protocol}://${upstream_proxy}",
-    vhost_cfg_append   => $allow_cfg,
+    listen_port      => $api_vhost_port,
+    proxy            => "${upstream_protocol}://${upstream_proxy}",
+    vhost_cfg_append => $allow_cfg,
   }
 
   nginx::resource::location{$api_root_loc:
-    vhost                       => $api_vhost,
-    location                    => $api_root_loc,
-    proxy                       => "${upstream_protocol}://${upstream_proxy}${api_root_loc}",
+    vhost    => $api_vhost,
+    location => $api_root_loc,
+    proxy    => "${upstream_protocol}://${upstream_proxy}${api_root_loc}",
   }
 
   nginx::resource::location{$api_artists_loc:
-    vhost                       => $api_vhost,
-    location                    => $api_artists_loc,
-    proxy                       => "${upstream_protocol}://${upstream_proxy}${api_artists_loc}",
-    proxy_cache                 => $proxy_cache_key,
-    proxy_cache_valid           => $proxy_cache_valid,
-    location_custom_cfg_append  => $proxy_cfg,
+    vhost                      => $api_vhost,
+    location                   => $api_artists_loc,
+    proxy                      => "${upstream_protocol}://${upstream_proxy}${api_artists_loc}",
+    proxy_cache                => $proxy_cache_key,
+    proxy_cache_valid          => $proxy_cache_valid,
+    location_custom_cfg_append => $proxy_cfg,
   }
 
   nginx::resource::location{$api_venues_loc:
-    vhost                       => $api_vhost,
-    location                    => $api_venues_loc,
-    proxy                       => "${upstream_protocol}://${upstream_proxy}${api_venues_loc}",
-    proxy_cache                 => $proxy_cache_key,
-    proxy_cache_valid           => $proxy_cache_valid,
-    location_custom_cfg_append  => $proxy_cfg,
+    vhost                      => $api_vhost,
+    location                   => $api_venues_loc,
+    proxy                      => "${upstream_protocol}://${upstream_proxy}${api_venues_loc}",
+    proxy_cache                => $proxy_cache_key,
+    proxy_cache_valid          => $proxy_cache_valid,
+    location_custom_cfg_append => $proxy_cfg,
   }
 }
